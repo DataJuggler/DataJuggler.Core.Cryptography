@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</Description>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography.git</RepositoryUrl>
+    <RepositoryType>Git Hub</RepositoryType>
+    <PackageTags>C# cryptography passwordhashing passwordhashing hashing dotnetcore dot net core encryption decryption</PackageTags>
+    <PackageReleaseNotes>This is the first release of this package, and documentation is coming soon.</PackageReleaseNotes>
+    <PackageIcon>Lock32.png</PackageIcon>
+    <PackageIconUrl />
+    <ApplicationIcon>Lock32.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DataJuggler.UltimateHelper.Core" Version="1.1.5" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Images\Lock32.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="License\License.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
