@@ -130,11 +130,11 @@ int index = decryptedHash.IndexOf("||||");
 // if the index was found<br/>
 if (index >= 0)<br/>
 {<br/>
-    // get the password<br/>
-    password = decryptedHash.Substring(0, index);<br/>
-    salty = decryptedHash.Substring(index + 4);<br/>
-    salt = Encoding.Unicode.GetBytes(salty);<br/>
-    storedHash = Encoding.Unicode.GetBytes(password);<br/>
+    &nbsp// get the password<br/>
+    &nbsppassword = decryptedHash.Substring(0, index);<br/>
+    &nbspsalty = decryptedHash.Substring(index + 4);<br/>
+    &nbspsalt = Encoding.Unicode.GetBytes(salty);<br/>
+    &nbspstoredHash = Encoding.Unicode.GetBytes(password);<br/>
 }<br/>
 <br/>
 At this point, the salt and storedHash should be loaded, so we can call another verifyHash override.
