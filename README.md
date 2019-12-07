@@ -121,33 +121,33 @@ The salty string is the characters after the 4 pipe characters.
 
 Both salt and storedHash are both byte arrays.
 
-byte[] salt = null;
+byte[] salt = null;<br/>
 byte[] storedHash = null;
 
-// get 
+// get the index<br/>
 int index = decryptedHash.IndexOf("||||");
 
-// if the index was found
-if (index >= 0)
-{
-    // get the password
-    password = decryptedHash.Substring(0, index);
-    salty = decryptedHash.Substring(index + 4);
-    salt = Encoding.Unicode.GetBytes(salty);
-    storedHash = Encoding.Unicode.GetBytes(password);
-}
-
+// if the index was found<br/>
+if (index >= 0)<br/>
+{<br/>
+    // get the password<br/>
+    password = decryptedHash.Substring(0, index);<br/>
+    salty = decryptedHash.Substring(index + 4);<br/>
+    salt = Encoding.Unicode.GetBytes(salty);<br/>
+    storedHash = Encoding.Unicode.GetBytes(password);<br/>
+}<br/>
+<br/>
 At this point, the salt and storedHash should be loaded, so we can call another verifyHash override.
 
 public static bool VerifyHash(string password, byte[] salt, byte[] storedHash)
 
 The verifyHash method creates a new passwordHash and compares it to the storedHash using Linq.
 
-// generate the loginHash again
-var newHash = HashPassword(password,  salt);
+// generate the loginHash again<br/><br/>
+var newHash = HashPassword(password,  salt);<br/>
 
 // set the return value
-verified = storedHash.SequenceEqual(newHash);
+verified = storedHash.SequenceEqual(newHash);<br/>
 
 I am in the process of building a Blazor.Crypto sample, but I wanted to publish the Nuget package first.
 
