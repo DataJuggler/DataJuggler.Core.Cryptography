@@ -146,9 +146,9 @@ The verifyHash method creates a new passwordHash and compares it to the storedHa
 // generate the loginHash again<br/><br/>
 var newHash = HashPassword(password,  salt);<br/>
 
-// set the return value
+// set the return value<br/>
 verified = storedHash.SequenceEqual(newHash);<br/>
-
+<br/>
 I am in the process of building a Blazor.Crypto sample, but I wanted to publish the Nuget package first.
 
 
