@@ -69,7 +69,9 @@ Password salting is the process of securing password hashes from something calle
 
 (I didn't want to try and define salt because I knew I would not do it justice).
 
---
+
+
+
 The salt is returned with the password separated by 4 | pipe characters.
 
 You can decrypt the encrypted password hash to determine the password hash and salt, but you
