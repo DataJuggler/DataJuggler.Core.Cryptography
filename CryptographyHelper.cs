@@ -12,12 +12,13 @@ using DataJuggler.UltimateHelper.Core.Objects;
 
 #endregion
 
-namespace DataJuggler.Core.UltimateHelper
+namespace DataJuggler.Core.Cryptography
 {
 
     #region class CryptographyHelper
     /// <summary>
-    /// This object hands all encryption for this application.
+    /// This class is designed to make encryption / decryption as well as Password Hashing / Verification 
+    /// simple for C# developers.
     /// </summary>
     public class CryptographyHelper
 	{
@@ -317,7 +318,7 @@ namespace DataJuggler.Core.UltimateHelper
                     // if the decryptedHash exists
                     if (TextHelper.Exists(decryptedHash))
                     {
-                        // create a byteArray
+                        // get the index of the 4 pipe characters
                         int index = decryptedHash.IndexOf("||||");
 
                         // if the index was found
@@ -342,7 +343,7 @@ namespace DataJuggler.Core.UltimateHelper
 
             #region VerifyHash(string password, byte[] salt, byte[] storedHash)
             /// <summary>
-            /// This method is used to verify the Hash created is the same as the 
+            /// This method is used to verify the Hash created is the same as the storedHash 
             /// </summary>
             /// <param name="password"></param>
             /// <param name="keyCode"></param>
