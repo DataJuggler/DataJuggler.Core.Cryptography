@@ -39,7 +39,7 @@ To use default password
 
 string encrypted = CryptographyHelper.EncryptString(stringToEncrypt);
 
-The encryption algorithm will return a different result every you encrypt a string. 
+The encryption algorithm will return a different result every time you encrypt a string. 
 
 # Decryption
 
