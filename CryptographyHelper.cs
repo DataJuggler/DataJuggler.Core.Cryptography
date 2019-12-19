@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using Konscious.Security.Cryptography;
 using System.Linq;
 using DataJuggler.UltimateHelper.Core;
-using DataJuggler.UltimateHelper.Core.Objects;
+using DataJuggler.Core.Cryptography.Objects;
 
 #endregion
 
@@ -17,8 +17,7 @@ namespace DataJuggler.Core.Cryptography
 
     #region class CryptographyHelper
     /// <summary>
-    /// This class is designed to make encryption / decryption as well as Password Hashing / Verification 
-    /// simple for C# developers.
+    /// This object hands all encryption for this application.
     /// </summary>
     public class CryptographyHelper
 	{
@@ -65,38 +64,44 @@ namespace DataJuggler.Core.Cryptography
                 // initial value
                 string decryptedValue = "";
 
-                // if both strings exist
-                if (TextHelper.Exists(stringToDecrypt, password))
+                try
                 {
-                    var ivAndCiphertext = Convert.FromBase64String(stringToDecrypt);
-                    if (ivAndCiphertext.Length >= 16)
+                    // if both strings exist
+                    if (TextHelper.Exists(stringToDecrypt, password))
                     {
-                        var iv = new byte[16];
-                        var ciphertext = new byte[ivAndCiphertext.Length - 16];
-                        Array.Copy(ivAndCiphertext, 0, iv, 0, iv.Length);
-                        Array.Copy(ivAndCiphertext, iv.Length, ciphertext, 0, ciphertext.Length);
-
-                        using (var aes = AesManaged.Create())
-                        using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
+                        var ivAndCiphertext = Convert.FromBase64String(stringToDecrypt);
+                        if (ivAndCiphertext.Length >= 16)
                         {
-                            var key = pbkdf2.GetBytes(32);
+                            var iv = new byte[16];
+                            var ciphertext = new byte[ivAndCiphertext.Length - 16];
+                            Array.Copy(ivAndCiphertext, 0, iv, 0, iv.Length);
+                            Array.Copy(ivAndCiphertext, iv.Length, ciphertext, 0, ciphertext.Length);
 
-                            aes.Mode = CipherMode.CBC;
-                            aes.Padding = PaddingMode.PKCS7;
-                            aes.Key = key;
-                            aes.IV = iv;
-
-                            // create a new Decryptor                            
-                            using (var aesTransformer = aes.CreateDecryptor())
+                            using (var aes = AesManaged.Create())
+                            using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
                             {
-                                // get a byte array of the plain text
-                                var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+                                var key = pbkdf2.GetBytes(32);
 
-                                // set the return value
-                                decryptedValue = Encoding.UTF8.GetString(plaintext);
+                                aes.Mode = CipherMode.CBC;
+                                aes.Padding = PaddingMode.PKCS7;
+                                aes.Key = key;
+                                aes.IV = iv;
+
+                                // create a new Decryptor                            
+                                using (var aesTransformer = aes.CreateDecryptor())
+                                {
+                                    // get a byte array of the plain text
+                                    var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+
+                                    // set the return value
+                                    decryptedValue = Encoding.UTF8.GetString(plaintext);
+                                }
                             }
                         }
                     }
+                }
+                catch
+                {
                 }
 
                 // return value
@@ -130,34 +135,40 @@ namespace DataJuggler.Core.Cryptography
                 // initial value
                 string encryptedString = "";
 
-                // if both strings exist
-                if (TextHelper.Exists(stringToEncrypt, password))
+                try
                 {
-                    // Remember to dispose of types that implement IDisposable - this old code had lots of memory leaks.
-                    using (var aes = AesManaged.Create())
-                    using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
-                    using (var rng = new RNGCryptoServiceProvider())
+                    // if both strings exist
+                    if (TextHelper.Exists(stringToEncrypt, password))
                     {
-                        var key = pbkdf2.GetBytes(32); // Let's use AES-256.
-                        var iv = new byte[16];
-                        rng.GetBytes(iv); // We always create a new, random IV for each operation.
-
-                        var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8
-
-                        aes.Mode = CipherMode.CBC;
-                        aes.Padding = PaddingMode.PKCS7;
-                        aes.Key = key;
-                        aes.IV = iv;
-
-                        using (var aesTransformer = aes.CreateEncryptor())
+                        // Remember to dispose of types that implement IDisposable - this old code had lots of memory leaks.
+                        using (var aes = AesManaged.Create())
+                        using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
+                        using (var rng = new RNGCryptoServiceProvider())
                         {
-                            var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
-                            var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
-                            Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
-                            Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
-                            encryptedString = Convert.ToBase64String(ivAndCiphertext);
+                            var key = pbkdf2.GetBytes(32); // Let's use AES-256.
+                            var iv = new byte[16];
+                            rng.GetBytes(iv); // We always create a new, random IV for each operation.
+
+                            var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8
+
+                            aes.Mode = CipherMode.CBC;
+                            aes.Padding = PaddingMode.PKCS7;
+                            aes.Key = key;
+                            aes.IV = iv;
+
+                            using (var aesTransformer = aes.CreateEncryptor())
+                            {
+                                var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
+                                var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
+                                Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
+                                Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
+                                encryptedString = Convert.ToBase64String(ivAndCiphertext);
+                            }
                         }
                     }
+                }
+                catch
+                {
                 }
 
                 // return value
@@ -302,38 +313,45 @@ namespace DataJuggler.Core.Cryptography
                 // initial value
                 bool verified = false;
 
-                // locals
-                // get the password up until the separator
-                string password = "";
-                string salty = "";
-                byte[] salt = null;
-                byte[] storedHash = null;
-
-                // if all the parameters exist
-                if (TextHelper.Exists(userTypedPassword, keyCode, storedPasswordHash))
+                try
                 {
-                    // we must first decrypt the storedPasswordHash with the keycode
-                    string decryptedHash = DecryptString(storedPasswordHash, keyCode);
+                    // locals
+                    // get the password up until the separator
+                    string password = "";
+                    string salty = "";
+                    byte[] salt = null;
+                    byte[] storedHash = null;
 
-                    // if the decryptedHash exists
-                    if (TextHelper.Exists(decryptedHash))
+                    // if all the parameters exist
+                    if (TextHelper.Exists(userTypedPassword, keyCode, storedPasswordHash))
                     {
-                        // get the index of the 4 pipe characters
-                        int index = decryptedHash.IndexOf("||||");
+                        // we must first decrypt the storedPasswordHash with the keycode
+                        string decryptedHash = DecryptString(storedPasswordHash, keyCode);
 
-                        // if the index was found
-                        if (index >= 0)
+                        // if the decryptedHash exists
+                        if (TextHelper.Exists(decryptedHash))
                         {
-                            // get the password
-                            password = decryptedHash.Substring(0, index);
-                            salty = decryptedHash.Substring(index + 4);
-                            salt = Encoding.Unicode.GetBytes(salty);
-                            storedHash = Encoding.Unicode.GetBytes(password);
-                        }
+                            // get the index of the 4 pipe characters
+                            int index = decryptedHash.IndexOf("||||");
 
-                        // now verify with the override
-                        verified = VerifyHash(userTypedPassword, salt, storedHash);
+                            // if the index was found
+                            if (index >= 0)
+                            {
+                                // get the password
+                                password = decryptedHash.Substring(0, index);
+                                salty = decryptedHash.Substring(index + 4);
+                                salt = Encoding.Unicode.GetBytes(salty);
+                                storedHash = Encoding.Unicode.GetBytes(password);
+                            }
+
+                            // now verify with the override
+                            verified = VerifyHash(userTypedPassword, salt, storedHash);
+                        }
                     }
+                }
+                catch 
+                {
+                    
                 }
 
                 // return value
@@ -343,7 +361,7 @@ namespace DataJuggler.Core.Cryptography
 
             #region VerifyHash(string password, byte[] salt, byte[] storedHash)
             /// <summary>
-            /// This method is used to verify the Hash created is the same as the storedHash 
+            /// This method is used to verify the Hash created is the same as the 
             /// </summary>
             /// <param name="password"></param>
             /// <param name="keyCode"></param>

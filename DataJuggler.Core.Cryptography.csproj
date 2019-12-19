@@ -2,25 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</Description>
+    <Version>1.0.7</Version>
+    <PackageId>DataJuggler.Core.Cryptography</PackageId>
+    <Authors>DataJuggler</Authors>
+    <Description>This is a port of the Dot Net Core version of CryptographyHelper from my Dot Net 
+Framework project DataJuggler.Core.UltimateHelper.
+
+This project adds many Nuget dependencies to use Konscious.Security.Cryptography in a Dot Net
+Core project, so I choose to create a separate project rather than include it in the Dot Net Core version of UltimateHelper, DataJuggler.Net.UltimateHelper.Core.
+
+
+To view the documentation, visit:
+https://github.com/DataJuggler/DataJuggler.Core.Cryptography/blob/master/README.md</Description>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography.git</RepositoryUrl>
-    <RepositoryType>Git Hub</RepositoryType>
-    <PackageTags>C# cryptography passwordhashing passwordhashing hashing dotnetcore dot net core encryption decryption</PackageTags>
-    <PackageReleaseNotes>This is the first release of this package, and documentation is coming soon.</PackageReleaseNotes>
     <PackageIcon>Lock32.png</PackageIcon>
     <PackageIconUrl />
-    <ApplicationIcon>Lock32.ico</ApplicationIcon>
+    <RepositoryUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography.git</RepositoryUrl>
+    <RepositoryType>Git</RepositoryType>
+    <PackageTags>C# csharp Cryptography</PackageTags>
+    <Copyright>DataJuggler 2019 - Use As Is - Do What You Want</Copyright>
+    <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</PackageProjectUrl>
+    <PackageReleaseNotes>Version 1.0.7 - I added try catches to all the methods.
+
+The first release had the wrong namespace.</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataJuggler.UltimateHelper.Core" Version="1.1.5" />
-    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.2.1" />
+    <Compile Remove="Sample\Blazor.CryptographySample\**" />
+    <EmbeddedResource Remove="Sample\Blazor.CryptographySample\**" />
+    <None Remove="Sample\Blazor.CryptographySample\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="License\License.txt" />
     <None Include="Images\Lock32.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -29,6 +44,22 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DataJuggler.UltimateHelper.Core" Version="1.1.7" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\BlazorToDoList\License\License.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="License\" />
   </ItemGroup>
 
 </Project>
