@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.7</Version>
+    <Version>1.0.9</Version>
     <PackageId>DataJuggler.Core.Cryptography</PackageId>
     <Authors>DataJuggler</Authors>
     <Description>This is a port of the Dot Net Core version of CryptographyHelper from my Dot Net 
@@ -22,7 +22,15 @@ https://github.com/DataJuggler/DataJuggler.Core.Cryptography/blob/master/README.
     <PackageTags>C# csharp Cryptography</PackageTags>
     <Copyright>DataJuggler 2019 - Use As Is - Do What You Want</Copyright>
     <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</PackageProjectUrl>
-    <PackageReleaseNotes>Version 1.0.7 - I added try catches to all the methods.
+    <PackageReleaseNotes>Version 1.0.9 - I am trying recreating the salt every time. Some password fail up to max retires
+count, and perhaps the salt is the problem. I noticed NotASecret default password is where this
+problem occurs. I might change it to something else if this still fails.
+
+Version 1.0.8 - I added a verifyRetries parameter to GeneratePasswordHash method. If set to true,
+the method will try and verify if it cannot be verified a new hash will be created and tried again up
+to the verirfyRetries count.
+
+Version 1.0.7 - I added try catches to all the methods.
 
 The first release had the wrong namespace.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
