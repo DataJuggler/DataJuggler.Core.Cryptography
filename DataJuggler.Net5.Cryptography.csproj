@@ -1,28 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Version>1.0.9</Version>
-    <PackageId>DataJuggler.Core.Cryptography</PackageId>
+    <TargetFramework>net5.0</TargetFramework>
+    <Version>1.5.0</Version>
+    <PackageId>DataJuggler.Net5.Cryptography</PackageId>
     <Authors>DataJuggler</Authors>
     <Description>This is a port of the Dot Net Core version of CryptographyHelper from my Dot Net 
 Framework project DataJuggler.Core.UltimateHelper.
+
+The code is available here: https://github.com/DataJuggler/DataJuggler.Net5.Cryptography
 
 This project adds many Nuget dependencies to use Konscious.Security.Cryptography in a Dot Net
 Core project, so I choose to create a separate project rather than include it in the Dot Net Core version of UltimateHelper, DataJuggler.Net.UltimateHelper.Core.
 
 
 To view the documentation, visit:
-https://github.com/DataJuggler/DataJuggler.Core.Cryptography/blob/master/README.md</Description>
+https://github.com/DataJuggler/DataJuggler.Net5.Cryptography/blob/master/README.md</Description>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageIcon>Lock32.png</PackageIcon>
     <PackageIconUrl />
-    <RepositoryUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/DataJuggler/DataJuggler.Net5.Cryptography.git</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>C# csharp Cryptography</PackageTags>
-    <Copyright>DataJuggler 2019 - Use As Is - Do What You Want</Copyright>
-    <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Core.Cryptography</PackageProjectUrl>
-    <PackageReleaseNotes>Version 1.0.9 - I am trying recreating the salt every time. Some password fail up to max retires
+    <Copyright>DataJuggler 2020 - Use As Is - Do What You Want</Copyright>
+    <PackageProjectUrl>https://github.com/DataJuggler/DataJuggler.Net5.Cryptography</PackageProjectUrl>
+    <PackageReleaseNotes>Version 1.5.0 - I ported this to .Net 5. Not sure if there are any advantages for doing that or not.
+
+Version 1.0.11 - I added a new optional parameter for VerifyHash that allows you to state that the userTypedPassword is actually a PasswordHash itself. This use case is designed for use with ProtectedLocalStorage to allow you to store the password hash on the client browser.
+This validation compares two encrypted passowrd hash strings that they are equal. As a test of security, it is verified that the encryptedPasswordHash stored can be used to create the salt. If the string decrypts with the keycode given and the salt is valid 16 bytes and the strings match exactly then this is considered verified also.
+
+Version 1.0.10 - I started testing today for the first time using the Nuget package and I couldn't get the class to show up. Trying again with the code set to Debug mode as it worked before I switched to Release.
+
+Version 1.0.9 - I am trying recreating the salt every time. Some password fail up to max retires
 count, and perhaps the salt is the problem. I noticed NotASecret default password is where this
 problem occurs. I might change it to something else if this still fails.
 
@@ -34,6 +43,7 @@ Version 1.0.7 - I added try catches to all the methods.
 
 The first release had the wrong namespace.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -55,7 +65,7 @@ The first release had the wrong namespace.</PackageReleaseNotes>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="DataJuggler.UltimateHelper.Core" Version="1.1.7" />
+    <PackageReference Include="DataJuggler.UltimateHelper" Version="1.5.1" />
     <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.2.1" />
   </ItemGroup>
 

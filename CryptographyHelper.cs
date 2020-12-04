@@ -7,12 +7,12 @@ using System.Text;
 using System.Security.Cryptography;
 using Konscious.Security.Cryptography;
 using System.Linq;
-using DataJuggler.UltimateHelper.Core;
-using DataJuggler.Core.Cryptography.Objects;
+using DataJuggler.UltimateHelper;
+using DataJuggler.Net5.Cryptography.Objects;
 
 #endregion
 
-namespace DataJuggler.Core.Cryptography
+namespace DataJuggler.Net5.Cryptography
 {
 
     #region class CryptographyHelper
@@ -276,6 +276,44 @@ namespace DataJuggler.Core.Cryptography
             }
             #endregion
 
+            #region GetStoredHash(string decryptedHash, byte[] salt)
+            /// <summary>
+            /// This method returns the StoredHash for the DecryptedHash
+            /// </summary>
+            /// <param name="decryptedHash"></param>
+            /// <returns></returns>
+            public static byte[] GetStoredHash(string decryptedHash, ref byte[] salt)
+            {
+                // initial value
+                byte[] storedHash = null;
+
+                // locals
+                string password = "";
+                string salty = "";
+                int index = -1;
+
+                // if the decryptedHash exists
+                if (TextHelper.Exists(decryptedHash))
+                {
+                    // get the index of the 4 pipe characters
+                    index = decryptedHash.IndexOf("||||");
+
+                    // if the index was found
+                    if (index >= 0)
+                    {
+                        // get the password
+                        password = decryptedHash.Substring(0, index);
+                        salty = decryptedHash.Substring(index + 4);
+                        salt = Encoding.Unicode.GetBytes(salty);
+                        storedHash = Encoding.Unicode.GetBytes(password);
+                    }
+                }
+
+                // return value
+                return storedHash;
+            }
+            #endregion
+
             #region HashPart1(string password, string keyCode)
             /// <summary>
             /// This method is used to call some portions of the GeneratePasswordHash
@@ -353,7 +391,7 @@ namespace DataJuggler.Core.Cryptography
             }
             #endregion
 
-            #region VerifyHash(string userTypedPassword, string storedPasswordHash)
+            #region VerifyHash(string userTypedPassword, string storedPasswordHash, bool userTypedPasswordIsHashed = false)
             /// <summary>
             /// This method is used to verify the Hash created is the same as a hash stored in the database.
             /// This method uses the default password, which is NotASecret. If you stored the password with a keycode
@@ -363,13 +401,13 @@ namespace DataJuggler.Core.Cryptography
             /// <param name="userTypedPassword">The password typed in by a user for a login attempt.</param>
             /// <param name="storedPasswordHash">The password hash that is stored with the salt.</param>
             /// <returns></returns>
-            public static bool VerifyHash(string userTypedPassword, string storedPasswordHash)
+            public static bool VerifyHash(string userTypedPassword, string storedPasswordHash, bool userTypedPasswordIsHashed = false)
             {
-                return VerifyHash(userTypedPassword, DefaultPassword, storedPasswordHash);
+                return VerifyHash(userTypedPassword, DefaultPassword, storedPasswordHash, userTypedPasswordIsHashed);
             }
             #endregion
 
-            #region VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash)
+            #region VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash, bool userTypedPasswordIsHashed = false)
             /// <summary>
             /// This method is used to verify the Hash created is the same as a hash stored in the database.
             /// </summary>
@@ -377,7 +415,7 @@ namespace DataJuggler.Core.Cryptography
             /// <param name="keyCode"></param>
             /// <param name="salt"></param>
             /// <returns></returns>
-            public static bool VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash)
+            public static bool VerifyHash(string userTypedPassword, string keyCode, string storedPasswordHash, bool userTypedPasswordIsHashed = false)
             {
                 // initial value
                 bool verified = false;
@@ -385,33 +423,39 @@ namespace DataJuggler.Core.Cryptography
                 try
                 {
                     // locals
-                    // get the password up until the separator
-                    string password = "";
-                    string salty = "";
                     byte[] salt = null;
                     byte[] storedHash = null;
-
+                    string decryptedHash = "";
+                    
                     // if all the parameters exist
                     if (TextHelper.Exists(userTypedPassword, keyCode, storedPasswordHash))
                     {
                         // we must first decrypt the storedPasswordHash with the keycode
-                        string decryptedHash = DecryptString(storedPasswordHash, keyCode);
+                        decryptedHash = DecryptString(storedPasswordHash, keyCode);
 
-                        // if the decryptedHash exists
-                        if (TextHelper.Exists(decryptedHash))
+                        // if the userTypedPassword is hashed already, this means the passwordHash was stored in something such as 
+                        // BrowserProtectedStorage, where I believe it is still a best practice to not store the original password.
+                        // This validation could be done outside of this class
+                        if (userTypedPasswordIsHashed)
                         {
-                            // get the index of the 4 pipe characters
-                            int index = decryptedHash.IndexOf("||||");
+                            // verify the text matches exactly and we know the storedPasswordHash is the same value stored in the database.
+                            verified = TextHelper.IsEqual(userTypedPassword, storedPasswordHash, true, true);
 
-                            // if the index was found
-                            if (index >= 0)
-                            {
-                                // get the password
-                                password = decryptedHash.Substring(0, index);
-                                salty = decryptedHash.Substring(index + 4);
-                                salt = Encoding.Unicode.GetBytes(salty);
-                                storedHash = Encoding.Unicode.GetBytes(password);
+                            // if the string do match
+                            if (verified)
+                            {   
+                                // Get the storedHash from the decryptedHash
+                                storedHash = GetStoredHash(decryptedHash, ref salt);
+
+                                // set verified to true if the storedHash was derived from the 
+                                verified = ((storedHash != null) && (salt != null) && (salt.Length == 16));
                             }
+                        }
+                        else
+                        {                          
+
+                            // Get the storedHash from the decryptedHash
+                            storedHash = GetStoredHash(decryptedHash, ref salt);
 
                             // now verify with the override
                             verified = VerifyHash(userTypedPassword, salt, storedHash);
