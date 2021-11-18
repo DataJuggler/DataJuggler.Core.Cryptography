@@ -40,12 +40,13 @@ namespace DataJuggler.Net5.Cryptography
                 // initial value
                 byte[] buffer = null;
 
-                // Create a strong random number generator
-                using (var rng = new RNGCryptoServiceProvider())
+                // create a new random number generator
+                using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
                 {
                     buffer = new byte[16];
                     rng.GetBytes(buffer);
                 }
+                
                 
                 // return value
                 return buffer;
@@ -77,24 +78,26 @@ namespace DataJuggler.Net5.Cryptography
                             Array.Copy(ivAndCiphertext, 0, iv, 0, iv.Length);
                             Array.Copy(ivAndCiphertext, iv.Length, ciphertext, 0, ciphertext.Length);
 
-                            using (var aes = AesManaged.Create())
-                            using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
+                            using (Aes aes = Aes.Create())
                             {
-                                var key = pbkdf2.GetBytes(32);
-
-                                aes.Mode = CipherMode.CBC;
-                                aes.Padding = PaddingMode.PKCS7;
-                                aes.Key = key;
-                                aes.IV = iv;
-
-                                // create a new Decryptor                            
-                                using (var aesTransformer = aes.CreateDecryptor())
+                                using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767))
                                 {
-                                    // get a byte array of the plain text
-                                    var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+                                    var key = pbkdf2.GetBytes(32);
 
-                                    // set the return value
-                                    decryptedValue = Encoding.UTF8.GetString(plaintext);
+                                    aes.Mode = CipherMode.CBC;
+                                    aes.Padding = PaddingMode.PKCS7;
+                                    aes.Key = key;
+                                    aes.IV = iv;
+
+                                    // create a new Decryptor                            
+                                    using (var aesTransformer = aes.CreateDecryptor())
+                                    {
+                                        // get a byte array of the plain text
+                                        var plaintext = aesTransformer.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+
+                                        // set the return value
+                                        decryptedValue = Encoding.UTF8.GetString(plaintext);
+                                    }
                                 }
                             }
                         }
@@ -141,28 +144,32 @@ namespace DataJuggler.Net5.Cryptography
                     if (TextHelper.Exists(stringToEncrypt, password))
                     {
                         // Remember to dispose of types that implement IDisposable - this old code had lots of memory leaks.
-                        using (var aes = AesManaged.Create())
-                        using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
-                        using (var rng = new RNGCryptoServiceProvider())
+                        using (Aes aes = Aes.Create())
                         {
-                            var key = pbkdf2.GetBytes(32); // Let's use AES-256.
-                            var iv = new byte[16];
-                            rng.GetBytes(iv); // We always create a new, random IV for each operation.
-
-                            var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8
-
-                            aes.Mode = CipherMode.CBC;
-                            aes.Padding = PaddingMode.PKCS7;
-                            aes.Key = key;
-                            aes.IV = iv;
-
-                            using (var aesTransformer = aes.CreateEncryptor())
+                            using (var pbkdf2 = new Rfc2898DeriveBytes(password, _pepper, 32767)) // MD5 is insecure as KDF, we use PBKDF2 instead.
                             {
-                                var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
-                                var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
-                                Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
-                                Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
-                                encryptedString = Convert.ToBase64String(ivAndCiphertext);
+                                using (var rng = RandomNumberGenerator.Create())
+                                {
+                                    var key = pbkdf2.GetBytes(32); // Let's use AES-256.
+                                    var iv = new byte[16];
+                                    rng.GetBytes(iv); // We always create a new, random IV for each operation.
+
+                                    var plaintext = Encoding.UTF8.GetBytes(stringToEncrypt); // We use UTF8
+
+                                    aes.Mode = CipherMode.CBC;
+                                    aes.Padding = PaddingMode.PKCS7;
+                                    aes.Key = key;
+                                    aes.IV = iv;
+
+                                    using (var aesTransformer = aes.CreateEncryptor())
+                                    {
+                                        var ciphertext = aesTransformer.TransformFinalBlock(plaintext, 0, plaintext.Length);
+                                        var ivAndCiphertext = new byte[iv.Length + ciphertext.Length];
+                                        Array.Copy(iv, 0, ivAndCiphertext, 0, iv.Length);
+                                        Array.Copy(ciphertext, 0, ivAndCiphertext, iv.Length, ciphertext.Length);
+                                        encryptedString = Convert.ToBase64String(ivAndCiphertext);
+                                    }
+                                }
                             }
                         }
                     }
